@@ -107,6 +107,8 @@ It defines DB schema using [Rails DSL](http://guides.rubyonrails.org/migrations.
   * Support `postgres://` schema ([pull#285](https://github.com/winebarrel/ridgepole/pull/285))
 * `>= 0.8.3`
   * Fix "topological sort failed" error ([pull#287](https://github.com/winebarrel/ridgepole/pull/287))
+* `>= 0.8.4`
+  * Support Rails 6 multiple databases config https://github.com/takamario/ridgepole/pull/1
 </details>
 
 ## Installation
@@ -191,6 +193,7 @@ Usage: ridgepole [options]
         --debug
         --[no-]color
     -v, --version
+    -D, --database DATABASE
 ```
 
 ## Usage

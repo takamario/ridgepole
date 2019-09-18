@@ -5,7 +5,7 @@ module Ridgepole
     def initialize(conn_spec, options = {})
       @options = options
 
-      ActiveRecord::Base.establish_connection(conn_spec)
+      ActiveRecord::Base.establish_connection(@options[:database] ? conn_spec[@options[:database]] : conn_spec)
 
       # XXX: If the required processing in class method?
       @options[:index_removed_drop_column] = true if !@options.key?(:index_removed_drop_column) && (Ridgepole::DefaultsLimit.adapter == :postgresql)

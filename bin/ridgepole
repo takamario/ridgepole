@@ -149,6 +149,8 @@ ARGV.options do |opt|
       exit
     end
 
+    opt.on('-D', '--database DATABASE') { |v| options[:database] = v }
+
     opt.parse!
 
     if !mode || (%i[apply export].include?(mode) && !config) || (options[:with_apply] && !config)

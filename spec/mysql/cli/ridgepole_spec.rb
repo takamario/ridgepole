@@ -61,6 +61,7 @@ describe 'ridgepole' do
             --debug
             --[no-]color
         -v, --version
+        -D, --database DATABASE
        MSG
     end
   end
@@ -403,6 +404,34 @@ describe 'ridgepole' do
           expect(out).to match_fuzzy <<-MSG
             Ridgepole::Client#initialize([#{conn_spec_str('ridgepole_test')}, {:dry_run=>false, :debug=>false, :color=>false}])
             Ridgepole::Client.diff([#{conf_file.path}, #{conn_spec_str('ridgepole_test')}, {:dry_run=>false, :debug=>false, :color=>false}])
+            Ridgepole::Delta#differ?
+          MSG
+        end
+      end
+
+      specify '.yml (development, multiple databases)' do
+        Tempfile.open(["#{File.basename __FILE__}.#{$PROCESS_ID}", '.yml']) do |conf_file|
+          conf_file.puts <<-YAML
+            development:
+              primary:
+                adapter: mysql2
+                database: ridgepole_development
+                user: root
+              primary_replica:
+                adapter: mysql2
+                database: ridgepole_development
+                user: read_only
+                replica: true
+          YAML
+          conf_file.flush
+
+          out, status = run_cli(args: ['-c', conf, '-d', conf_file.path, conf, '-D', 'primary'])
+
+          expect(status.success?).to be_truthy
+
+          expect(out).to match_fuzzy <<-MSG
+            Ridgepole::Client#initialize([#{conn_spec_str('ridgepole_test')}, {:dry_run=>false, :debug=>false, :color=>false, :database=>"primary"}])
+            Ridgepole::Client.diff([{"primary"=>{"adapter"=>"mysql2", "database"=>"ridgepole_development", "user"=>"root"}, "primary_replica"=>{"adapter"=>"mysql2", "database"=>"ridgepole_development", "user"=>"read_only", "replica"=>true}}, #{conn_spec_str('ridgepole_test')}, {:dry_run=>false, :debug=>false, :color=>false, :database=>"primary"}])
             Ridgepole::Delta#differ?
           MSG
         end
